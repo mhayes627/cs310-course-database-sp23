@@ -3,11 +3,10 @@ package edu.jsu.mcis.cs310.coursedb.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 
 public class SectionDAO {
     
-    // INSERT YOUR CODE HERE
+    private static final String QUERY_FIND = "SELECT * FROM section WHERE termid = ? and subjectid = ? and num = ? ORDER BY crn";
     
     private final DAOFactory daoFactory;
     
@@ -21,7 +20,6 @@ public class SectionDAO {
         
         PreparedStatement ps = null;
         ResultSet rs = null;
-        ResultSetMetaData rsmd = null;
         
         try {
             
@@ -29,10 +27,19 @@ public class SectionDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_FIND, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ps.setInt(1, termid);
+                ps.setString(2, subjectid);
+                ps.setString(3, num);
+                
+                boolean hasresults = ps.execute();
+                
+                if (hasresults) {
+                    rs = ps.getResultSet();
+                    result = DAOUtility.getResultSetAsJson(rs);
+                }
                 
             }
-            
         }
         
         catch (Exception e) { e.printStackTrace(); }
